@@ -1,4 +1,4 @@
-local framework = GetFrameworkObject()
+local framework = LoadFramework()
 local Config = require('config.config')
 
 
