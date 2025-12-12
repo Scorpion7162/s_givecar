@@ -90,6 +90,15 @@ function SendLog(playerId, logUrl, title, type, data)
             { ['Content-Type'] = 'application/json' }
         )
         return true
+    elseif Config.logs == 'ox_lib' then
+        local metadata = {}
+        if data then
+            for _, entry in ipairs(data) do
+                metadata[entry.key] = entry.value
+            end
+        end
+        lib.logger(playerId, title, json.encode(metadata))
+        return true
     else
         debugprint('No logging method configured')
     end
