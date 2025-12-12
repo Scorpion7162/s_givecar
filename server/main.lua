@@ -91,7 +91,7 @@ RegisterNetEvent('s_givecar:processVehicleClaim', function(claimId)
     
     if not identifier or not claimId then
         debugprint('Invalid claim data - Identifier: ' .. tostring(identifier) .. ', ClaimId: ' .. tostring(claimId))
-        lib.notify(src, {
+        lib.notify(src, { -- I dont know this doesnt seem right (thanks randolio)
             title = 'Error',
             description = 'Invalid claim',
             type = 'error'
