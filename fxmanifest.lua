@@ -1,7 +1,7 @@
 fx_version 'cerulean'
 game 'gta5'
 author 'Scorpion'
-
+version '1.0.1'
 description 'Give vehicles to a player.'
 
 
@@ -24,4 +24,5 @@ server_scripts{
 
 shared_scripts{
     'config/config.lua',
+    'shared/utils.lua',
 }

@@ -35,11 +35,14 @@ function LoadFramework()
             return 'esx'
         else
             error('No supported framework found! Please start either qb-core, esx, or qbx_core.')
+            return nil
         end
     elseif not (Config.framework == 'qb-core' or Config.framework == 'esx' or Config.framework == 'qbx_core') then
         error('Invalid framework specified in config! Supported frameworks are \'qb-core\', \'esx\', \'qbx_core\', or \'auto - which auto detects framework\'.')
+        return nil
     end
     debugprint('Using configured framework: ' .. tostring(Config.framework))
+    return Config.framework
 end
 
 
