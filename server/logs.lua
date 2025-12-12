@@ -91,7 +91,7 @@ function SendLog(playerId, logUrl, title, type, data)
         )
         return true
     else
-        debug('No logging method configured')
+        debugprint('No logging method configured')
     end
 end
 

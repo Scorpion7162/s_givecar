@@ -22,21 +22,98 @@ lib.addCommand(Config.command, {
     },
     restricted = Config.restricted,
 }, function(source, args, rawCommand)
-    debug('Command ' .. Config.command .. ' executed by source: ' .. tostring(source))
+    debugprint('Command ' .. Config.command .. ' executed by source: ' .. tostring(source))
     local targetId = args.id
     local vehicleModel = args.model
     local customPlate = args.customplate
-    debug('Target ID: ' .. tostring(targetId) .. ', Model: ' .. tostring(vehicleModel) .. ', Custom Plate: ' .. tostring(customPlate or 'N/A'))
+    debugprint('Target ID: ' .. tostring(targetId) .. ', Model: ' .. tostring(vehicleModel) .. ', Custom Plate: ' .. tostring(customPlate or 'N/A'))
+    
     local targetPlayer = GetFrameworkPlayer(targetId)
-    debug('Retrieved target player: ' .. tostring(targetPlayer ~= nil))
+    if not targetPlayer then
+        debugprint('Target player not found')
+        lib.notify(source, {
+            title = 'Error',
+            description = 'Target player not found',
+            type = 'error'
+        })
+        return
+    end
+    debugprint('Retrieved target player: ' .. tostring(targetPlayer ~= nil))
 
-   SendLog(source, Log.ApplyPlate, 'Gave vehicle', 'success', {
+    local plate = customPlate or GeneratePlate()
+    debugprint('Using plate: ' .. tostring(plate))
+    
+    local targetIdentifier = GetPlayerIdentifier(targetId)
+    if not targetIdentifier then
+        debugprint('Failed to get target identifier')
+        lib.notify(source, {
+            title = 'Error',
+            description = 'Failed to get player identifier',
+            type = 'error'
+        })
+        return
+    end
+    
+    if Config.saveandcollect then
+        -- Add to claims table for later collection
+        debugprint('Adding vehicle to claims table for later collection')
+        MySQL.insert('INSERT INTO '..Config.claimstable..' (identifier, vehicle_model, plate, garage) VALUES (?, ?, ?, ?)', {
+            targetIdentifier,
+            vehicleModel,
+            plate,
+            Config.defaultgarage
+        })
+        debugprint('Vehicle claim added to database')
+        
+        if Config.notifyplayer then
+            lib.notify(targetId, {
+                title = 'Vehicle Available',
+                description = 'A '..vehicleModel..' is available for claim. Use /'..Config.claimscommand,
+                type = 'inform'
+            })
+        end
+        
+        lib.notify(source, {
+            title = 'Success',
+            description = 'Vehicle claim created for player '..targetId,
+            type = 'success'
+        })
+    else
+        -- Directly add to garage
+        debugprint('Directly adding vehicle to player garage')
+        local success = AddVehicleToGarage(targetId, vehicleModel, plate, Config.defaultgarage)
+        
+        if success then
+            if Config.notifyplayer then
+                lib.notify(targetId, {
+                    title = 'Vehicle Received',
+                    description = 'A '..vehicleModel..' has been added to your garage',
+                    type = 'success'
+                })
+            end
+            
+            lib.notify(source, {
+                title = 'Success',
+                description = 'Vehicle given to player '..targetId,
+                type = 'success'
+            })
+        else
+            lib.notify(source, {
+                title = 'Error',
+                description = 'Failed to give vehicle',
+                type = 'error'
+            })
+        end
+    end
+
+    SendLog(source, Log.ApplyPlate, 'Gave vehicle', 'success', {
         { key = 'Target ID', value = targetId },
         { key = 'Source ID', value = source },
-        { key = 'Target Player Name', value = targetPlayer.name },
-        { key = 'Source Player Name', value = GetFrameworkPlayer(source).name },
+        { key = 'Target Player Name', value = targetPlayer.name or 'Unknown' },
+        { key = 'Source Player Name', value = GetFrameworkPlayer(source).name or 'Unknown' },
         { key = 'Vehicle Model', value = vehicleModel },
-        { key = 'Custom Plate', value = customPlate or 'N/A' },
+        { key = 'Plate', value = plate },
+        { key = 'Method', value = Config.saveandcollect and 'Claim' or 'Direct' },
     })
 
 end)
@@ -46,10 +123,10 @@ lib.addCommand(Config.claimscommand, {
     help = 'Open the vehicle claims UI',
     restricted = false,
 }, function(source, args, rawCommand)
-    debug('Command ' .. Config.claimscommand .. ' executed by source: ' .. tostring(source))
+    debugprint('Command ' .. Config.claimscommand .. ' executed by source: ' .. tostring(source))
     local claims = GetPlayerVehicleClaims(source)
-    debug('Found ' .. #claims .. ' claims for source: ' .. tostring(source))
+    debugprint('Found ' .. #claims .. ' claims for source: ' .. tostring(source))
     local options = BuildClaimsMenuOptions(claims)
     TriggerClientEvent('s_givecar:openClaimsUI', source, options)
-    debug('Sent claims UI to client with ' .. #options .. ' options to source: ' .. tostring(source))
+    debugprint('Sent claims UI to client with ' .. #options .. ' options to source: ' .. tostring(source))
 end)

@@ -1,7 +1,7 @@
 return {
     ---@type boolean
-    -- Debug Mode: Set this to true to enable a metric fuck ton of debug prints
-    debug = false, -- Default: false - boolean: true/false
+    -- debugprint Mode: Set this to true to enable a metric fuck ton of debugprint prints
+    debugprint = false, -- Default: false - boolean: true/false
     -- Save And Collect: this will store the vehicle in an ox_lib ui, where they can claim their vehicles later
     saveandcollect = true, -- Default: true - boolean: true/false 
     -- Allow Custom Plate Parameters: Allow players to set a custom plate using /givecar [id] [model] [customplate] (max of 8 chars)
