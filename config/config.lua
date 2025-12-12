@@ -24,7 +24,7 @@ return {
     -- The default format for generated plates (only used if allowcustomplateparam is false or the plate param is not provided)
     plateformat = 'AAAA1111',  -- format of the plate (lib.string.random - https://coxdocs.dev/ox_lib/Modules/String/Shared#libstring )
     -- The logging method for vehicle gives
-    logs = 'fivemanage', -- Options: false, 'fivemanage', 'discord' (FIVEMANAGE RECOMMENDED)    
+    logs = 'fivemanage', -- Options: false, 'fivemanage', 'discord', 'ox_lib' (FIVEMANAGE RECOMMENDED)    
 
     -- blacklistedvehicles: A list of vehicle models that are not allowed to be given
     blacklistedvehicles = {`police`, `police2`, `ambulance`},
